@@ -18,6 +18,16 @@ class TestPersonName(unittest.TestCase):
         myname = APersonName(fname, mname, lname);
         self.assertEqual("Arvind Sundararajan", str(myname))
 
+class TestEntityName(unittest.TestCase):
+    """ This class implements the unit tests for EntityNames """
+    def test_entity_name_fail(self):
+        """ Tests that empty entity name raises an exception """
+        self.assertRaises(AError, lambda: AEntityName(""))
+    def test_entity_name_pass(self):
+        """ Verifies that a legal name is okay """
+        stratton = AEntityName("stratton")
+        self.assertEqual(str(stratton), "stratton")
+
 if __name__ == '__main__':
     unittest.main()
 

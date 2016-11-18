@@ -53,3 +53,36 @@ class APersonName(AName):
         return full_name 
     def __str__(self):
         return self.__repr__()
+    def __bool__(self):
+        """ If a name could be constructed it then it must be true """
+        return True
+
+class AEntityName(AName):
+    """ An object that encapsulates a general name string for an entity.
+
+    This is used to identify names for studios, companies etc. This name cannot
+    be an empty string
+
+    Attributes:
+        name : A String that represents the name
+    """
+    def __init__(self, name):
+        if name:
+            self.name = str(name)
+        else:
+            raise AError(name + " : Not a legal name")
+    def get_name():
+        """ Returns a string that represents the name """
+        return name
+    def __str__(self):
+        """ String representation for the object """
+        return name
+    def __bool__(self):
+        """ Bool representation of this object """
+        return True
+    def __repr__(self):
+        """ String conversion of the object """
+        return self.__str__()
+
+
+
