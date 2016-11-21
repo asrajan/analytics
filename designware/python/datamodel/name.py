@@ -73,10 +73,10 @@ class AEntityName(AName):
             raise AError(name + " : Not a legal name")
     def get_name():
         """ Returns a string that represents the name """
-        return name
+        return self.name
     def __str__(self):
         """ String representation for the object """
-        return name
+        return self.name
     def __bool__(self):
         """ Bool representation of this object """
         return True

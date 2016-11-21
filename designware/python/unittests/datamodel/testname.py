@@ -1,6 +1,7 @@
 """ This file implements the unit tests for name module """
 import unittest
 from datamodel.name import APersonName
+from datamodel.name import AEntityName
 from datamodel.error import AError
 
 class TestPersonName(unittest.TestCase):
@@ -9,7 +10,8 @@ class TestPersonName(unittest.TestCase):
         fname = ""
         mname = ""
         lname = ""
-        self.assertRaises(AError, lambda: APersonName(fname, mname, lname))
+        with self.assertRaises(AError):
+            APersonName(fname, mname, lname)
     def test_name_print(self):
         """ Creates a valid name and prints it correctly """
         fname = "Arvind"
@@ -22,7 +24,8 @@ class TestEntityName(unittest.TestCase):
     """ This class implements the unit tests for EntityNames """
     def test_entity_name_fail(self):
         """ Tests that empty entity name raises an exception """
-        self.assertRaises(AError, lambda: AEntityName(""))
+        with self.assertRaises(AError):
+            AEntityName("")
     def test_entity_name_pass(self):
         """ Verifies that a legal name is okay """
         stratton = AEntityName("stratton")

@@ -30,8 +30,5 @@ class TestArtwork(unittest.TestCase):
             artwork.set_designer("Vincent", "Van", "Gogh")
         self.assertTrue(artwork.get_designer())
 
-
-
-
 if __name__ == '__main__':
     unittest.main()
