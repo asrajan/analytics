@@ -1,0 +1,13 @@
+{
+    "name" : "Artwork Design",
+    "formats" : {
+        "fileextensions" : ["tif", "tiff"],
+        "layer" : ["AW([a-zA-Z0-9]+)SEP(\\d+)"],
+        "flat" : ["AW([a-zA-Z0-9]+)flat$", "AW([a-zA-Z0-9]+)-FLAT$","AW(\\S*)FLAT$"],
+        "texture" : ["AW(\\S*)TEX$"],
+        "index" : ["AW(\\S*)-INDEX$"],
+        "full" : ["AW(\\S*)"],
+        "search_order" : ["index", "flat", "texture", "layer", "full"],
+        "ignore_files" : ["AW(\\S*)PALETTE"]
+    }
+}
