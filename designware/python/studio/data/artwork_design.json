@@ -8,6 +8,6 @@
         "index" : ["AW(\\S*)-INDEX$"],
         "full" : ["AW(\\S*)"],
         "search_order" : ["index", "flat", "texture", "layer", "full"],
-        "ignore_files" : ["AW(\\S*)PALETTE"]
+        "ignore_files" : ["AW(.*)PALETTE"]
     }
 }

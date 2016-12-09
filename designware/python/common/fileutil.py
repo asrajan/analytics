@@ -22,10 +22,10 @@ def is_tiff(file):
 
 def is_hidden_file(file):
     """ Returns true if the file is a hidden system file """
-    h_files = [r"Thumbs\.db$", r".*.ini$", r"\.DS_STORE"]
+    h_files = [r"thumbs\.db$", r".*.ini$", r"\.ds_store"]
     for h_file in h_files:
         h_file_re = re.compile(h_file)
-        if h_file_re.search(file):
+        if h_file_re.search(file.lower()):
             return True
     return False
 
