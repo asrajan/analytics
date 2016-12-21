@@ -3,6 +3,7 @@ module : Query
 description: Defines a base calss for all queries
 """
 from abc import ABCMeta,abstractmethod
+from .query_base import AQueryBase
 
 class AQueryError(Exception):
     """ This is the base class for all exceptions raised in the framework
@@ -19,7 +20,7 @@ class AQueryError(Exception):
     def __str__(self):
         return self.message
 
-class AQuery(object, metaclass=ABCMeta):
+class AQuery(AQueryBase, metaclass=ABCMeta):
     """ A class representation for SQL query
 
     Encapsulates the query string as well as the result of the query. These
@@ -34,12 +35,12 @@ class AQuery(object, metaclass=ABCMeta):
                 only be read after the query has been exected.
     """
     def __init__(self):
+        super().__init__()
         self._query = ""
         self._query_tuple = ()
         self._init_query()
         if not self._query:
             raise RuntimeError("Query not set")
-        self._table = None
 
     @property
     def query(self):
@@ -52,12 +53,6 @@ class AQuery(object, metaclass=ABCMeta):
     @property
     def query_tuple(self):
         return self._query_tuple
-
-    @property
-    def table(self):
-        if not self._table:
-            raise RuntimeError("Cannot access uninitialized property")
-        return self._table
 
     @abstractmethod
     def _init_query(self):
