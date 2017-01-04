@@ -74,3 +74,6 @@ class AFilter(AQueryBase, metaclass=ABCMeta):
     def _filter(self):
         pass
     
+    def __len__(self):
+        return len(self._table)
+    

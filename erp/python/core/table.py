@@ -30,6 +30,11 @@ class ATable(object):
         self._types = None
         self._data = None
 
+    def __len__(self):
+        if not self._data:
+            raise RuntimeError('Undefined length')
+        return len(self._data)
+        
     @property
     def columns(self):
         if not self._columns:
@@ -84,6 +89,26 @@ class ATable(object):
                 if x[0] != type(x[1]):
                     raise RuntimeError("Type error in row " + idx)
         return True # Data base is consistent
+    
+    def index(self, name):
+        ''' Returns the column index provided the name.
+        
+        Returns the index of the column provided the name. If 
+        name does not exist, raies an exception.
+        '''
+        if name in self.columns:
+            return self.columns.index(name)
+        raise RuntimeError('Column with name "{}" does not exist')
+        
+    def __iter__(self):
+        self._index = 0
+        return self
+    
+    def __next__(self):
+        if self._index < len(self._data):
+            self._index = self._index + 1
+            return self._data[self._index-1]
+        raise StopIteration()
 
 
 

@@ -22,10 +22,18 @@ class AQueryBase(object, metaclass=ABCMeta):
     """
     def __init__(self):
         self._table = None
+        
+    def __len__(self):
+        return len(self._table)
 
     @property
     def table(self):
         if not self._table:
-            raise RuntimeError("Cannot access uninitialized property")
+            raise RuntimeError("Cannot access un-initialized property")
         return self._table
+    
+    def has_run(self):
+        if not self._table:
+            return False
+        return True
 

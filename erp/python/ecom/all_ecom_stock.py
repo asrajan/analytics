@@ -1,65 +1,16 @@
 '''
-module : check_upc
+module : all_ecom_stock
 
-All items that are exposed to ECommerce site at Envogue International
-must have UPC assigned to them. This module implements class that qualifies
-that data based on this constraint.
+A query that returns all stock items that will be displayed on Ecommerce site
 
-Note : The correct business process is to assign UPC to items that have no
-label associated with them. An EDI control file is created to drop the label
-from a sales order to extract UPC.
+The rule for a stock item to be displayed on ECommerce site is as follows:
+1. There must be atleast >= 50 items that are OTS
+2. It must be available in one of the warehouses for the company
 '''
 from core import AQuery
-from core import AFilter
 
-
-class AUPCSet(object):
-    ''' Creates UPC sets to verify that a UPC has been assigned for a given
-    SKU.
-    
-    For eCommerce site to function, a UPC needs to be assigned to each SKU.
-    This class provides a set interface to check if SKU has a UPC assigned
-    or not.
-    
-    Note : In BlueCherry Implementation, for every SKU, first a non labeled
-    SKU MUST be created to which a UPC needs to be assigned. Strictly
-    speaking, labeled SKUs should not have UPC assigned. An EDI Control 
-    header is created in which on detecting a labeled SKU the label is dropped
-    and then the UPC is matched.
-    
-    Attributes:
-        _g_set : Set of SKUs that have no Label and have a UPC assigned
-        _l_upc : Set of SKUs that have a label and UPC assigned.
-    '''
-    def __init__(self, query):
-        self._g_set = set()
-        self._l_set = set()
-        self._create(query)
-    
-    def _create(self, query):
-        ''' Populates the _g_set and _l_set. '''
-        if not query.has_run():
-            raise RuntimeError('Query has not been Run')
-        for entry in query.table:
-            if not entry[query.table.index('UPC')]:
-                continue
-            else:
-                if not entry[query.table.index('Lbl_code')]:
-                    self._g_set.add(tuple(entry[:query.table.index('UPC')]))
-                else:
-                    self._l_set.add(tuple(entry[:query.table.index('UPC')]))
-    
-    def __contains__(self, item):
-        ''' Implements the contains in for this set '''
-        item = tuple(item)
-        if item in self._g_set:
-            return True
-        if item in self._l_set:
-            return True
-        return False
-        
-class ACheckUPC(AQuery):
-    ''' A query for inventory information.
+class AAllEComStock(AQuery):
+    ''' A query that returns all the stock items
 
     Blue Cherry maintains the running aggregates in a table called ZZXSSUMH.
     This table maintains quantity exchanged during every transaction that is
@@ -122,13 +73,7 @@ class ACheckUPC(AQuery):
             (ss.lbl_code) AS  Lbl_code, 
             (ss.Location) AS Location,
             ((IsNull(qfusa,0)+IsNull(qfurt,0)+IsNull(qfur1,0)+IsNull(qfur2,0)-IsNull(qfuin,0)-IsNull(qfucm,0))+(IsNull(qfurv,0)-IsNull(qfuri,0))) AS Total_QOH, 
-            -- (ss.qfuop) AS Open__, 
-            -- (ss.qfupk) AS Pick, 
-            (IsNull(qfur1,0)+IsNull(qfur2,0)+IsNull(qfurt,0)+IsNull(qfusa,0)-IsNull(qfuin,0)-IsNull(qfucm,0)-IsNull(qfupk,0)-IsNull(qfurs,0)-IsNull(qfuop,0)-IsNull(qfudm,0)) AS OTS_INV, 
-            -- ((IsNull(qfusa,0)+IsNull(qfurt,0)+IsNull(qfur1,0)+IsNull(qfur2,0)-IsNull(qfuin,0)-IsNull(qfupk,0)-IsNull(qfuop,0)-IsNull(qfucm,0)-IsNull(qfurs,0)-IsNull(qfudm,0))+IsNull(qfust,0)+(IsNull(qfurv,0)-IsNull(qfuri,0)-IsNull(qfurp,0)-IsNull(qfuro,0))) AS Total_OTS_Ship_To_WIP, 
-            -- (ss.qfuin) AS Invoice, 
-            -- (ss.size_bk) AS Size_Bk, 
-            (U.UPC) AS UPC
+            (IsNull(qfur1,0)+IsNull(qfur2,0)+IsNull(qfurt,0)+IsNull(qfusa,0)-IsNull(qfuin,0)-IsNull(qfucm,0)-IsNull(qfupk,0)-IsNull(qfurs,0)-IsNull(qfuop,0)-IsNull(qfudm,0)) AS OTS_INV
             from (
                 select d.division, 
                     d.style, 
@@ -237,7 +182,6 @@ class ACheckUPC(AQuery):
             AND 1=1 
             AND ((IsNull(QFUR1,0)+IsNull(QFUR2,0)+IsNull(QFURT,0)+IsNull(QFUSA,0)-IsNull(QFUIN,0)-IsNull(QFUCM,0)-IsNull(QFUPK,0)-IsNull(QFURS,0)-IsNull(QFUOP,0)-IsNull(QFUDM,0)) >= %s)
             AND (ss.location != 'FOB') AND (ss.location != '') AND (ss.location != 'POE')
-            AND (u.upc IS NULL)
             ORDER BY s.style,
                 s.division,
                 ss.color_code,
@@ -245,21 +189,3 @@ class ACheckUPC(AQuery):
                 ss.lbl_code
         '''
         self._query_tuple = (self._ots,)
-
-class ACheckUPCFilter(AFilter):
-    ''' Implements a UPC Filter
-    
-    Sometimes an SKU can have an unassigned UPC which it borrows from some other
-    SKU. In those cases we should exclude those SKUs from Unassigned UPC list.
-    '''
-    def __init__(self, filter_query, upc_set_query):
-        super().__init__(filter_query, True)
-        self.upc_set = AUPCSet(upc_set_query)
-    
-    def _filter(self):
-        self._table._data = []
-        for entry in self._query._table:
-            if entry in self.upc_set:
-                continue
-            new_entry = entry
-            self._table._data.append(new_entry)

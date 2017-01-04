@@ -19,10 +19,10 @@ class AWriteTable(object):
 
     Attributes:
         table : A reference to the ATable object
-        filename : String basename of the file to be created.
+        file  : Either name of the file to be writen out or a file object
     """
-    def __init__(self, table, filename):
-        self._filename = filename
+    def __init__(self, table, file):
+        self._file = file
         self._table = table
         # Additional validation - Maybe superfluous
         self._table._validate()
@@ -58,7 +58,7 @@ class AWriteTable(object):
         self._data_type_cols()
         
         try:
-            self._wb.save(self._filename)
+            self._wb.save(self._file)
         except PermissionError:
             logging.info('''Failed to create an Excel file. Probably opened.''')
             raise
